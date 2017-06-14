@@ -1,0 +1,31 @@
+function graph=graphSeries(data)
+graph=figure();
+hold on;
+fields=fieldnames(data);
+for i=[1:length(fields)]
+    disp(fields(i))
+    specimen=data.(char(fields(i)));
+    
+    subplot(1,2,1);
+    hold on;
+    title('Stress-Strain Curve');
+    xlabel('Engineering Strain');
+    ylabel('Engineering Stress [MPa]');
+    legend();
+    scatter(specimen.strain,specimen.stress,'.');
+    
+    %Setting origin on stress-strain plot:
+    ax=gca;
+    ax.XLim=[0,max(specimen.strain)]
+    ax.YLim=[0,max(
+    
+    
+    subplot(1,2,2);
+    hold on;
+    title('Youngs Modulus Determination');
+    xlabel('Engineering Strain');
+    ylabel('Modulus (x10^6');
+    legend();
+    scatter(specimen.strain,specimen.modulus,'.');
+end
+end
