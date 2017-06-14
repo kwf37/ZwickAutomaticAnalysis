@@ -34,27 +34,30 @@ for i=[1:n]
     
     %Calculating stress and strain arrays
     temp.stress=temp.force./temp.area;
-    temp.stress=temp.stress.*1000000 %converting to pascals
+    temp.stress=temp.stress.*1000000; %converting to pascals
     temp.strain=temp.displacement./gaugelength;
-    
-    %Storing ultimate stress coordinates- note that ultimate strain is
-    %technically very very incorrect, but was an easy to remember name. It
-    %is just the strain corresponding to the ultimate stress.
-    temp.ultimatestress=max(temp.stress);
-    temp.ultimatestrain=temp.strain(find(temp.stress==temp.ultimatestress));
     
     %Normalizing stress and strain on graph. Considers negative force to be
     %compression, so the offset zeros the zero stress point
     temp.offset=temp.strain(find(temp.stress==min(abs(temp.stress))));
     temp.strain=temp.strain-temp.offset;
     
+    %Storing ultimate stress coordinates- note that ultimate strain is
+    %technically very very incorrect, but was an easy to remember name. It
+    %is just the strain corresponding to the ultimate stress.
+    temp.ultimatestress=max(temp.stress);
+    temp.ultimateindex=find(temp.stress==temp.ultimatestress);
+    temp.ultimatestrain=temp.strain(temp.ultimateindex);
+    
     %Calculating toughness using trapezoidal approximation
     temp.toughness=trapz(temp.strain,temp.stress);
     
     %Calculating Young's Modulus
-    temp.curve=polyfit(temp.strain(1:find(temp.strain==temp.ultimatestrain)),temp.stress(1:find(temp.stress==temp.ultimatestress)),5)
+    temp.curve=polyfit(temp.strain(1:temp.ultimateindex),temp.stress(1:temp.ultimateindex),100);
     temp.derivative=polyder(temp.curve);
-    temp.slopes=polyval(temp.derivative,
+    temp.slopes=polyval(temp.derivative,temp.strain);
+    temp.modulus=max(temp.slopes)
+    temp.error=polyval(temp.curve,temp.strain(1:temp.ultimateindex))-temp.strain(1:temp.ultimateindex)
     
     %Storing in temp in data structure
     fieldname=strcat('specimen',num2str(i));
